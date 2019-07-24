@@ -1,4 +1,7 @@
 {
     "domain": "powerwall2batterycharge",
     "name": "Powerwall 2 battery charge sensor"
+    "documentation": "https://github.com/swm11/swmhassio",
+    "requirements": [],
+    "dependencies": []
 }
