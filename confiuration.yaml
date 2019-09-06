@@ -48,7 +48,15 @@ sensor:
     value_template: '{{ value | multiply(0.001) | round(1) }}'
 
   - platform: rest
-    resource: https://192.168.1.202/api/system_status/soe
+    # resource: http://freezerpi.local:5000/temperature
+    resource: http://192.168.1.227:5000/temperature
+    method: GET
+    name: Freezer Temperature
+    value_template: '{{ value_json.temperature }}'
+    unit_of_measurement: "C"
+
+  - platform: rest
+    resource: https://192.168.1.201/api/system_status/soe
     verify_ssl: false
     name: Powerwall2 Battery Charge
     device_class: battery
@@ -57,8 +65,9 @@ sensor:
 
   - platform: rest
     name: powerwall
-    resource: https://192.168.1.202/api/meters/aggregates
+    resource: https://192.168.1.201/api/meters/aggregates
     verify_ssl: false
+    #    scan_interval: 120
     json_attributes:
       - site
       - battery
@@ -84,6 +93,18 @@ sensor:
         device_class: power
         unit_of_measurement: 'kW'
 
+  - platform: darksky
+    api_key: cadbffc5eb25c18e8ea9529b93c3f0d0
+    forecast:
+      - 0
+    hourly_forecast:
+      - 0
+      - 1
+    monitored_conditions:
+      - summary
+      - icon
+      - temperature
+      
 #  - platform: command_line
 #    name: swmtest
 #    command: "python3 /config/python_scripts/returnten.py"
