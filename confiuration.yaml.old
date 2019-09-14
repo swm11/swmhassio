@@ -1,0 +1,91 @@
+
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
+
+# Uncomment this if you are using SSL/TLS, running in Docker container, etc.
+# http:
+#   base_url: example.duckdns.org:8123
+
+# Text to speech
+tts:
+  - platform: google_translate
+
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
+
+# SWM added 23 July 2019:
+# Example configuration.yaml entry
+weather:
+  - platform: metoffice
+    api_key: 4516cae0-e8b6-4d30-9f74-4b22ed65baee
+
+sensor:
+  - platform: metoffice
+    api_key: 4516cae0-e8b6-4d30-9f74-4b22ed65baee
+    monitored_conditions:
+      - weather
+      - temperature
+      - feels_like_temperature
+#      - wind_speed
+#      - wind_direction
+#      - wind_gust
+#      - visibility
+#      - visibility_distance
+#      - uv
+      - precipitation
+      - humidity
+
+# SWM: try a sensor based on:
+# https://www.home-assistant.io/components/sensor.command_line/
+# Example configuration.yaml entry
+#sensor:
+  - platform: command_line
+    name: CPU Temperature
+    command: "cat /sys/class/thermal/thermal_zone0/temp"
+    # If errors occur, remove degree symbol below
+    unit_of_measurement: "C"
+    value_template: '{{ value | multiply(0.001) | round(1) }}'
+
+  - platform: rest
+    resource: https://192.168.1.202/api/system_status/soe
+    verify_ssl: false
+    name: Powerwall2 Battery Charge
+    device_class: battery
+    value_template: '{{ value_json.percentage }}'
+    unit_of_measurement: "%"
+
+  - platform: rest
+    name: powerwall
+    resource: https://192.168.1.202/api/meters/aggregates
+    verify_ssl: false
+    json_attributes:
+      - site
+      - battery
+      - load
+      - solar
+    value_template: 'OK'
+  - platform: template
+    sensors:
+      grid_power:
+        value_template: '{{ states.sensor.powerwall.attributes["site"]["instant_power"] | multiply(0.001) }}'
+        device_class: power
+        unit_of_measurement: 'kW'
+      battery_power:
+        value_template: '{{ states.sensor.powerwall.attributes["battery"]["instant_power"] | multiply(0.001) }}'
+        device_class: power
+        unit_of_measurement: 'kW'
+      house_power:
+        value_template: '{{ states.sensor.powerwall.attributes["load"]["instant_power"] | multiply(0.001) }}'
+        device_class: power
+        unit_of_measurement: 'kW'
+      solar_power:
+        value_template: '{{ states.sensor.powerwall.attributes["solar"]["instant_power"] | multiply(0.001) }}'
+        device_class: power
+        unit_of_measurement: 'kW'
+
+#  - platform: command_line
+#    name: swmtest
+#    command: "python3 /config/python_scripts/returnten.py"
+#    unit_of_measurement: "%"
+
