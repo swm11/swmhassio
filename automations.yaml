@@ -1,0 +1,14 @@
+# automation:
+  - alias: "Warn freezer door open"
+    initial_state: "false"
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.freezer_temperature
+        above: -2.0
+    condition: []
+    action:
+      - service: light.turn_on
+        data:
+          entity_id: light.living_room_left
+          brightness: 255
+          rgb_color: [255,0,0]
