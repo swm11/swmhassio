@@ -58,7 +58,7 @@ sensor:
 
   - platform: rest
     name: "Powerwall2 Battery Charge"
-    resource: https://192.168.1.201/api/system_status/soe
+    resource: https://192.168.1.220/api/system_status/soe
     verify_ssl: false
     device_class: battery
     value_template: '{{ value_json.percentage }}'
@@ -66,7 +66,7 @@ sensor:
 
   - platform: rest
     name: powerwall
-    resource: https://192.168.1.201/api/meters/aggregates
+    resource: https://192.168.1.220/api/meters/aggregates
     verify_ssl: false
     #    scan_interval: 120
     json_attributes:
